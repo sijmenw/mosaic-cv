@@ -1,7 +1,5 @@
 # created by Sijmen van der Willik
 # 2019-06-14 15:39
-
-# boxes are [x1, y1, x2, y2]
 import numpy as np
 import cv2
 
@@ -24,17 +22,24 @@ class Box:
 
 
 class Individual:
+    """An Individual holds the coordinates of which the polygons are based.
+    Coordinates can be moved around using the mutate function.
+    Error is based on difference between original image and image drawn from polygons.
+    """
     def __init__(self, img, grid_size):
+        # grid size is (rows, columns)
+        r_size = img.shape[0] // grid_size[0]
+        c_size = img.shape[1] // grid_size[1]
+
+        # crop so unused size is dropped
+        img = img[:r_size * grid_size[0], :c_size * grid_size[1]]
+
         self.img = img
         self.canvas = np.zeros_like(img)
         self.im_shape = img.shape
         self.boxes = [["" for c in range(grid_size[1])] for r in range(grid_size[0])]
         self.grid_points = [["" for c in range(grid_size[1]-1)] for r in range(grid_size[0]-1)]
         self.grid_size = grid_size
-
-        # grid size is (rows, columns)
-        r_size = img.shape[0] // grid_size[0]
-        c_size = img.shape[1] // grid_size[1]
 
         for c in range(grid_size[1] - 1):
             for r in range(grid_size[0] - 1):
@@ -98,6 +103,7 @@ class Individual:
                 shift_y = np.random.randint(-10, 10)
 
                 # mutate grid points
+                old_canv = np.copy(self.canvas)
                 self.grid_points[r][c][0] += shift_x
                 self.grid_points[r][c][1] += shift_y
 
@@ -107,6 +113,7 @@ class Individual:
                 if new_err > err:
                     self.grid_points[r][c][0] -= shift_x
                     self.grid_points[r][c][1] -= shift_y
+                    self.canvas = old_canv
                 else:
                     print("OLD: {}, NEW: {} ({}/{})".format(err, new_err,
                                                             (self.grid_size[0] - 1) * c + r + 1,

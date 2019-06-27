@@ -10,6 +10,12 @@ import matplotlib.pyplot as plt
 
 
 def show_img(img, mode='large'):
+    """Function to properly show different types of images, accepts binary, black and white and colour images
+
+    :param img:
+    :param mode:
+    :return:
+    """
     if np.max(img) <= 1:
         print("Showing as binary mask")
         if len(img.shape) > 2:
@@ -36,7 +42,7 @@ def flex_combine(images, shape=None, h_pad=10, v_pad=10):
     :param shape:
     :param h_pad:
     :param v_pad:
-    :return:
+    :return: <numpy array>
     """
     max_h = 0
     max_w = 0
